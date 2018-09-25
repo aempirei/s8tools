@@ -4,7 +4,7 @@ CXXFLAGS = -Wall -pedantic -std=gnu++14 -O2 -Wno-unused-result
 CC = gcc
 CCFLAGS = -Wall -W -w
 CFLAGS = -Wall -W -pedantic -std=gnu99
-TARGETS = bin/norm bin/mean bin/hull bin/abs bin/auto
+TARGETS = bin/norm bin/mean bin/hull bin/abs bin/auto bin/plot 
 INSTALL_PATH = /usr/local
 OBJECTS = src/*.o
 
