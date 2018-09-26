@@ -29,7 +29,7 @@ int main() {
 	int maxima = INT8_MIN;
 	int filter[3] = { INT8_MIN, INT8_MIN, INT8_MIN };
 	while((ch = getchar()) != EOF) {
-		pushift(filter, ch);
+		pushift(filter, (char)ch);
 		if(is_maxima(filter))
 			maxima = is(filter);
 		putchar(maxima);

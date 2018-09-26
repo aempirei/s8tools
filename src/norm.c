@@ -25,7 +25,6 @@ int main(int argc, char **argv) {
 	long sum12 = 0;
 
 	double x = 0;
-	int n = 1000;
 
 	if(argc != 3)
 		FATALF("\nusage: %s file1 file2\n\n", *argv);
@@ -42,33 +41,22 @@ int main(int argc, char **argv) {
 	if(fstat(fileno(f2), &s2) == -1)
 		FATAL("failed to stat file2");
 
-	if(s1.st_ino != s2.st_ino) {
+	if(s1.st_size != s2.st_size)
+		FATALF("error: inputs of unequal size\n");
 
-		for(;;) {
+	while(--s1.st_size && --s2.st_size) {
 
-			c1 = fgetc(f1);
-			c2 = fgetc(f2);
+		c1 = (char)fgetc(f1);
+		c2 = (char)fgetc(f2);
 
-			if(c1 == EOF || c2 == EOF)
-				break;
-
-			sum12 += c1 * c2;
-			sum1 += c1 * c1;
-			sum2 += c2 * c2;
-		}
-
-		if(c1 != EOF || c2 != EOF)
-			FATALF("error: unequal sized input\n");
-
-		x = sum12 / (sqrt(sum1) * sqrt(sum2));
-
-		n = (int)rint(x * 1000);
-
-		if(n > 999)
-			n = 999;
+		sum12 += c1 * c2;
+		sum1 += c1 * c1;
+		sum2 += c2 * c2;
 	}
 
-	printf("%d\n", n);
+	x = sum12 / (sqrt(sum1) * sqrt(sum2));
+
+	printf("%f\n", x);
 
 	return 0;
 }

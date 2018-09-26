@@ -6,5 +6,12 @@
 #include <unistd.h>
 
 int main() {
+	int ch = 0;
+	int n = 0;
+	printf("<path d=\"M %d %d ", n++, ch);
+	while((ch = getchar()) != EOF) {
+		printf("l %d %d ", n++, (char)ch);
+	}
+	printf("/>\n");
 	return 0;
 }

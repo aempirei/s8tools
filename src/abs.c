@@ -6,8 +6,8 @@
 #include <unistd.h>
 
 int main() {
-	int c;
-	while((c = getchar()) != EOF)
-		putchar(abs(c));
+	int ch;
+	while((ch = getchar()) != EOF)
+		putchar(abs((char)ch));
 	return 0;
 }
