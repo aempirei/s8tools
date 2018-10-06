@@ -4,13 +4,19 @@ CXXFLAGS = -Wall -pedantic -std=gnu++14 -O2 -Wno-unused-result
 CC = gcc
 CCFLAGS = -Wall -W -w -lm
 CFLAGS = -Wall -W -pedantic -std=gnu99
-TARGETS = bin/norm bin/mean bin/hull bin/abs bin/auto bin/plot bin/dx bin/half
+SOURCES = $(wildcard src/*.c)
+OBJECTS = $(SOURCES:.c=.o)
+TARGETS = $(SOURCES:src/%.c=bin/%)
 INSTALL_PATH = /usr/local
-OBJECTS = src/*.o
 
 .PHONY: all clean install
 
 all: $(TARGETS)
+
+say:
+	@echo "SOURCES = $(SOURCES)"
+	@echo "OBJECTS = $(OBJECTS)"
+	@echo "TARGETS = $(TARGETS)"
 
 clean:
 	rm -f $(TARGETS)
