@@ -11,9 +11,9 @@ int main() {
 	int ch;
 
 	if(!feof(stdin)) while((ch = getchar()) != EOF) {
-		x[1] = x[2];
-		x[2] = (char)ch;
-		ch = x[2] - x[1];
+		x[0] = x[1];
+		x[1] = (char)ch;
+		ch = x[1] - x[0];
 		if(ch > INT8_MAX)
 			ch = INT8_MAX;
 		if(ch < INT8_MIN)

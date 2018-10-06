@@ -10,8 +10,9 @@ int main() {
 	int n = 0;
 	printf("<path d=\"M %d %d ", n++, ch);
 	while((ch = getchar()) != EOF) {
-		printf("l %d %d ", n++, (char)ch);
+		ch = (char)ch;
+		printf("L %d %d ", n++, ch);
 	}
-	printf("/>\n");
+	printf("\" />\n");
 	return 0;
 }

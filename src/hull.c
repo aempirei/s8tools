@@ -11,7 +11,7 @@ int is_maxima(const int filter[3]) {
 }
 
 int is(const int filter[3]) {
-	return filter[2];
+	return filter[1];
 }
 
 int pushift(int filter[3], int x) {
