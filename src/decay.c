@@ -16,7 +16,7 @@ int main() {
 				state--;
 			else if(state < 0)
 				state++;
-		} else
+		} else if(abs(ch) > abs(state))
 			state = ch;
 		putchar(state);
 	}
