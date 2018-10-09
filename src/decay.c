@@ -6,6 +6,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+int sign(int x) {
+	return (x > 0) ? 1 : (x < 0) ? -1 : 0;
+}
+
 int main() {
 	int ch;
 	int state = 0;
@@ -16,7 +20,7 @@ int main() {
 				state--;
 			else if(state < 0)
 				state++;
-		} else if(abs(ch) > abs(state))
+		} else if(sign(ch) != sign(state))
 			state = ch;
 		putchar(state);
 	}
