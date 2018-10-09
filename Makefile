@@ -11,7 +11,10 @@ INSTALL_PATH = /usr/local
 
 .PHONY: all clean install
 
-all: $(TARGETS)
+all: bin $(TARGETS)
+
+bin:
+	@mkdir bin
 
 say:
 	@echo "SOURCES = $(SOURCES)"
@@ -21,6 +24,7 @@ say:
 clean:
 	rm -f $(TARGETS)
 	rm -f $(OBJECTS)
+	rmdir bin
 
 install: $(TARGETS)
 	install -m 755 bin/norm $(INSTALL_PATH)/bin
