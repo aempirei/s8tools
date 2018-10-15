@@ -7,9 +7,12 @@
 #include <unistd.h>
 
 int main() {
-	char s[65536];
-	char *p = s;
+	char *s, *p;
 	int ch;
+	if((s = p = malloc(1 << 20)) == NULL) {
+		perror("malloc()");
+		return -1;
+	}
 	while((ch = getchar()) != EOF && p != (s + sizeof(s)))
 		*p++ = ch;
 	while(p-- > s)
