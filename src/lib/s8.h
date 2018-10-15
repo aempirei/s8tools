@@ -4,5 +4,8 @@
 int s8_bank_init(char *, int, FILE *);
 int s8_bank_shift(char *, int, FILE *);
 const char *s8_context_dirname();
+int s8_context_nextid();
+int s8_context_init();
+
 
 #endif
