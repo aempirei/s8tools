@@ -15,6 +15,7 @@ bin:
 clean:
 	rm -f $(TARGETS)
 	rm -f $(OBJECTS)
+	rm -f src/lib/s8.o
 	rmdir bin
 
 src/lib/s8.o: src/lib/s8.c src/lib/s8.h
