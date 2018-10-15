@@ -10,7 +10,7 @@ TARGETS = $(SOURCES:src/%.c=bin/%)
 all: bin $(TARGETS)
 
 bin:
-	@mkdir bin
+	mkdir bin
 
 clean:
 	rm -f $(TARGETS)
