@@ -6,19 +6,19 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+int clip(int x) {
+	return x > INT8_MAX ? INT8_MAX : x < INT8_MIN ? INT8_MIN : x;
+}
+
 int main() {
+
 	char x[2] = { 0, getchar() };
 	int ch;
 
-	if(!feof(stdin)) while((ch = getchar()) != EOF) {
+	while((ch = getchar()) != EOF) {
 		x[0] = x[1];
-		x[1] = (char)ch;
-		ch = x[1] - x[0];
-		if(ch > INT8_MAX)
-			ch = INT8_MAX;
-		if(ch < INT8_MIN)
-			ch = INT8_MIN;
-		putchar(ch);
+		x[1] = ch;
+		putchar(clip(x[1] - x[0]));
 	}
 	return 0;
 }
