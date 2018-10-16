@@ -24,7 +24,12 @@ const char *s8_io_basename() {
 	return s;
 }
 
-const char *s8_io_filename(char *p, size_t sz, const char *key) {
+const char *s8_io_filename(const char *key) {
+	static char s[NAME_MAX];
+	return s8_io_filename_r(s, sizeof(s), key);
+}
+
+const char *s8_io_filename_r(char *p, size_t sz, const char *key) {
 	snprintf(p, sz, "%s%s", s8_io_basename(), key);
 	return p;
 }
@@ -32,7 +37,7 @@ const char *s8_io_filename(char *p, size_t sz, const char *key) {
 FILE *s8_io_open(const char *key, const char *mode) {
 	struct stat sb;
 	char filename[NAME_MAX];
-	s8_io_filename(filename, sizeof(filename), key);
+	s8_io_filename_r(filename, sizeof(filename), key);
 	if(mkfifo(filename, 0700) == -1 && errno != EEXIST)
 		return NULL;
 	if(stat(filename, &sb) == -1)
@@ -45,13 +50,40 @@ FILE *s8_io_open(const char *key, const char *mode) {
 }
 
 int s8_io_close(FILE *f, const char *key, const char *mode) {
-	int n = fclose(f);
 	if(strcmp(mode, "r") == 0) {
 		char filename[NAME_MAX];
-		s8_io_filename(filename, sizeof(filename), key);
-		n = unlink(filename);
+		s8_io_filename_r(filename, sizeof(filename), key);
+		unlink(filename);
 	}
-	return n;
+	return fclose(f);
+}
+
+int s8_io_close_all(FILE **f, char **keys, size_t n, const char *mode) {
+	int retval = 0;
+	int e = 0;
+	for(size_t k = 0; k < n; k++) {
+		if(s8_io_close(f[k], keys[k], mode) == -1) {
+			retval = -1;
+			e = errno;
+		}
+	}
+	errno = e;
+	return retval;
+}
+
+
+int s8_io_open_all(FILE **f, char **keys, size_t n, const char *mode) {
+	int e;
+	for(size_t k = 0; k < n; k++) {
+		if((f[k] = s8_io_open(keys[k], mode)) == NULL) {
+			e = errno;
+			if(k > 0)
+				s8_io_close_all(f, keys, k-1, mode);
+			errno = e;
+			return -1;
+		}
+	}
+	return 0;
 }
 
 int s8_bank_init(char *s, int n, FILE *f) {
