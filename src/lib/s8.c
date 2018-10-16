@@ -86,17 +86,37 @@ int s8_io_open_all(FILE **f, char **keys, size_t n, const char *mode) {
 	return 0;
 }
 
-bool s8_bank_init(char *s, int n, FILE *f) {
+bool s8_bank_init(char *s, size_t n, FILE *f) {
 	*s = 0;
-	for(int i = 1; i < n; i++)
+	for(size_t i = 1; i < n; i++)
 		s[i] = fgetc(f);
 	return !feof(f);
 }
 
-bool s8_bank_shift(char *s, int n, FILE *f) {
-	int i;
-	for(i = 1; i < n; i++)
+bool s8_bank_shift(char *s, size_t n, FILE *f) {
+	int ch;
+	for(size_t i = 1; i < n; i++)
 		s[i - 1] = s[i];
-	s[i - 1] = fgetc(f);
-	return !feof(f);
+	s[n - 1] = ch = fgetc(f);
+	return (ch != EOF);
 }
+
+bool s8_bank_next(char *s, size_t n, FILE *f) {
+	for(size_t k = 0; k < n; k++) {
+		int ch = fgetc(f);
+		if(ch == EOF)
+			return false;
+		s[k] = ch;
+	}
+	return true;
+}
+
+bool s8_bank_defun(char *s, int *d, char **coefs, size_t n) {
+	if(n < 2 || s == NULL || d == NULL || coefs == NULL)
+		return false;
+	*d = atoi(coefs[--n]);
+	for(size_t k = 0; k < n; k++)
+		s[k] = atoi(coefs[k]);
+	return true;
+}
+
