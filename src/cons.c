@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <s8.h>
 
-int ifarg(size_t n, size_t argc, char **argv, int retval, int min, int max) {
+static inline int ifarg(size_t n, size_t argc, char **argv, int retval, int min, int max) {
 	if(argc > n)
 		retval = atoi(argv[n]);
 	return retval < min ? min : retval > max ? max : retval;
@@ -28,5 +28,5 @@ int main(int argc, char **argv) {
 			n %= shift;
 		}
 	}
-	return 0;
+	exit(EXIT_SUCCESS);
 }

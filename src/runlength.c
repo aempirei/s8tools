@@ -9,7 +9,7 @@
 enum slope { up, down, flat, unknown };
 
 int print_run(int rl, enum slope s) {
-	return printf("%d %s\n", rl, (s == up) ? "up" : (s == down) ? "down" : (s == flat) ? "flat" : "unknown");			
+	return printf("%d %s\n", rl, (s == up) ? "up" : (s == down) ? "down" : (s == flat) ? "flat" : "unknown");
 }
 
 int main() {

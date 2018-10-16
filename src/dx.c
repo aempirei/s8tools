@@ -7,8 +7,8 @@
 #include <unistd.h>
 #include <s8.h>
 
-int clip(int x) {
-	return x > INT8_MAX ? INT8_MAX : x < INT8_MIN ? INT8_MIN : x;
+static inline int clip(int x) {
+	return x > CHAR_MAX ? CHAR_MAX : x < CHAR_MIN ? CHAR_MIN : x;
 }
 
 int main() {
@@ -16,5 +16,5 @@ int main() {
 	if(s8_bank_init(x, sizeof(x), stdin))
 		while(s8_bank_shift(x, sizeof(x), stdin))
 			putchar(clip(x[1] - x[0]));
-	return 0;
+	exit(EXIT_SUCCESS);
 }

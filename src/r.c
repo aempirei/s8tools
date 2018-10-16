@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 
 	if(s8_io_open_all(f, &argv[1], N, "r") == -1) {
 		perror("s8_io_open_all()");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 
 	for(size_t k = 0; k < N; k++)
@@ -22,8 +22,8 @@ int main(int argc, char **argv) {
 
 	if(s8_io_close_all(f, argv+1, N, "r") == -1) {
 		perror("s8_io_close_all()");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 
-	exit(0);
+	exit(EXIT_SUCCESS);
 }

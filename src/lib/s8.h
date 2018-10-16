@@ -7,7 +7,7 @@ bool s8_bank_init(char *, size_t, FILE *);
 bool s8_bank_shift(char *, size_t, FILE *);
 bool s8_bank_next(char *, size_t, FILE *);
 bool s8_bank_defun(char *, int *, char **, size_t);
-long int s8_bank_f(const char *, const char *, int, size_t);
+long int s8_bank_apply(const char *, const char *, int, size_t);
 
 const char *s8_io_basename();
 const char *s8_io_filename_r(char *, size_t, const char *);

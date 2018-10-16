@@ -120,3 +120,9 @@ bool s8_bank_defun(char *s, int *d, char **coefs, size_t n) {
 	return true;
 }
 
+long int s8_bank_apply(const char *f, const char *g, int d, size_t n) {
+	long int x = 0;
+	for(size_t k = 0; k < n; k++)
+		x += f[k] * g[k];
+	return x / d;
+}
