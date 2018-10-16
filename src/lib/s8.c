@@ -86,14 +86,14 @@ int s8_io_open_all(FILE **f, char **keys, size_t n, const char *mode) {
 	return 0;
 }
 
-int s8_bank_init(char *s, int n, FILE *f) {
+bool s8_bank_init(char *s, int n, FILE *f) {
 	*s = 0;
 	for(int i = 1; i < n; i++)
 		s[i] = fgetc(f);
 	return !feof(f);
 }
 
-int s8_bank_shift(char *s, int n, FILE *f) {
+bool s8_bank_shift(char *s, int n, FILE *f) {
 	int i;
 	for(i = 1; i < n; i++)
 		s[i - 1] = s[i];

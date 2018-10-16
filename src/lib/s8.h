@@ -1,8 +1,10 @@
 #ifndef _S8_H
-#define _S8_H
+#define _S8_H 1
 
-int s8_bank_init(char *, int, FILE *);
-int s8_bank_shift(char *, int, FILE *);
+#include <stdbool.h>
+
+bool s8_bank_init(char *, int, FILE *);
+bool s8_bank_shift(char *, int, FILE *);
 
 const char *s8_io_basename();
 const char *s8_io_filename_r(char *, size_t, const char *);
