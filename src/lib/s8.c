@@ -14,7 +14,7 @@ static inline const char *nulltoempty(const char *s) {
 	return s ? s : "";
 }
 
-const char *s8_context_basename() {
+const char *s8_io_basename() {
 	static char s[NAME_MAX] = "/tmp/s8-fifo.";
 	static bool done = false;
 	if(!done) {
@@ -24,15 +24,15 @@ const char *s8_context_basename() {
 	return s;
 }
 
-const char *s8_context_filename(char *p, size_t sz, const char *key) {
-	snprintf(p, sz, "%s%s", s8_context_basename(), key);
+const char *s8_io_filename(char *p, size_t sz, const char *key) {
+	snprintf(p, sz, "%s%s", s8_io_basename(), key);
 	return p;
 }
 
-FILE *s8_open(const char *key, const char *mode) {
+FILE *s8_io_open(const char *key, const char *mode) {
 	struct stat sb;
 	char filename[NAME_MAX];
-	s8_context_filename(filename, sizeof(filename), key);
+	s8_io_filename(filename, sizeof(filename), key);
 	if(mkfifo(filename, 0700) == -1 && errno != EEXIST)
 		return NULL;
 	if(stat(filename, &sb) == -1)
@@ -44,11 +44,11 @@ FILE *s8_open(const char *key, const char *mode) {
 	return fopen(filename, mode);
 }
 
-int s8_close(FILE *f, const char *key, const char *mode) {
+int s8_io_close(FILE *f, const char *key, const char *mode) {
 	int n = fclose(f);
 	if(strcmp(mode, "r") == 0) {
 		char filename[NAME_MAX];
-		s8_context_filename(filename, sizeof(filename), key);
+		s8_io_filename(filename, sizeof(filename), key);
 		n = unlink(filename);
 	}
 	return n;
