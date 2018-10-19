@@ -37,6 +37,13 @@ const char *s8_io_filename_r(char *p, size_t sz, const char *key) {
 FILE *s8_io_open(const char *key, const char *mode) {
 	struct stat sb;
 	char filename[NAME_MAX];
+
+	if(strcmp(key, "-") == 0)
+		return fdopen(strcmp(mode, "w") ? strcmp(mode, "r") ? STDERR_FILENO : STDIN_FILENO : STDOUT_FILENO, mode);
+
+	if(strcmp(key, ".") == 0)
+		return fopen("/dev/null", mode);
+
 	s8_io_filename_r(filename, sizeof(filename), key);
 	if(mkfifo(filename, 0700) == -1 && errno != EEXIST)
 		return NULL;
