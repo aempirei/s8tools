@@ -39,7 +39,7 @@ FILE *s8_io_open(const char *key, const char *mode) {
 	char filename[NAME_MAX];
 
 	if(strcmp(key, "-") == 0)
-		return fdopen(strcmp(mode, "w") ? strcmp(mode, "r") ? STDERR_FILENO : STDIN_FILENO : STDOUT_FILENO, mode);
+		return fdopen(dup(strcmp(mode, "w") ? strcmp(mode, "r") ? STDERR_FILENO : STDIN_FILENO : STDOUT_FILENO), mode);
 
 	if(strcmp(key, ".") == 0)
 		return fopen("/dev/null", mode);
