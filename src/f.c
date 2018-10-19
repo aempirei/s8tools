@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
        	*f = argc == 2 ? atoi(argv[1]) : 1;
 
 	if(argc > 2 && !s8_bank_defun(f, &d, argv+1, N+1)) {
-		fprintf(stderr, "s8_bank_defun(..., %d): %s\n", N+1, "failed");
+		fprintf(stderr, "s8_bank_defun(..., %d): %s\n", (int)N+1, "failed");
 		exit(EXIT_FAILURE);
 	}
 
