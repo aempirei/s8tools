@@ -8,15 +8,18 @@ int main(int argc, char **argv) {
 	int ch;
 
 	for(const char *q = fmt; *q; q++) {
-		if(strchr("su", *q) == NULL) {
+		if(strchr("su+", *q) == NULL) {
 			fprintf(stderr, "unexpected character '%c' in format string \"%s\"\n", *q, fmt);
 			exit(EXIT_FAILURE);
 		}
 	}
 
 	while((ch = getchar()) != EOF) {
-		printf("%d", *p++ == 's' ? (char)ch : ch);
-		putchar(*p ? ' ' : '\n');
+		if(*p == '+')
+			printf("%c", (char)ch < 0 ? '-' : (char)ch > 0 ? '+' : '0');
+		else
+			printf("%d", *p == 's' ? (char)ch : ch);
+		putchar(*++p ? ' ' : '\n');
 		if(*p == '\0')
 			p = fmt;
 	}

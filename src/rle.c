@@ -23,5 +23,10 @@ int main() {
 		}
 	}
 
+	if(pch != EOF) {
+		putchar(run);
+		putchar(pch);
+	}
+
 	exit(EXIT_SUCCESS);
 }

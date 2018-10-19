@@ -44,6 +44,9 @@ FILE *s8_io_open(const char *key, const char *mode) {
 	if(strcmp(key, ".") == 0)
 		return fopen("/dev/null", mode);
 
+	if(strcmp(key, "0") == 0)
+		return fopen("/dev/zero", mode);
+
 	s8_io_filename_r(filename, sizeof(filename), key);
 	if(mkfifo(filename, 0700) == -1 && errno != EEXIST)
 		return NULL;
