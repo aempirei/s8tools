@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	while(s8_bank_next(x, N, stdin))
+	while(s8_bank_serial_next(x, N, stdin))
 		putchar(clip(s8_bank_apply(f, x, d, N)));
 
 	exit(EXIT_SUCCESS);

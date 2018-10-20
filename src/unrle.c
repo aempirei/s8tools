@@ -5,7 +5,7 @@
 int main() {
 	char x[2];
 
-	while(s8_bank_next(x, 2, stdin))
+	while(s8_bank_serial_next(x, 2, stdin))
 		for(size_t k = 0; k < (unsigned char)x[0]; k++)
 			putchar(x[1]);
 

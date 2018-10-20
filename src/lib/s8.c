@@ -68,7 +68,7 @@ int s8_io_close(FILE *f, const char *key, const char *mode) {
 	return fclose(f);
 }
 
-int s8_io_close_all(FILE **f, char **keys, size_t n, const char *mode) {
+int s8_io_close_all(FILE *f[], char *keys[], size_t n, const char *mode) {
 	int retval = 0;
 	int e = 0;
 	for(size_t k = 0; k < n; k++) {
@@ -82,7 +82,7 @@ int s8_io_close_all(FILE **f, char **keys, size_t n, const char *mode) {
 }
 
 
-int s8_io_open_all(FILE **f, char **keys, size_t n, const char *mode) {
+int s8_io_open_all(FILE *f[], char *keys[], size_t n, const char *mode) {
 	int e;
 	for(size_t k = 0; k < n; k++) {
 		if((f[k] = s8_io_open(keys[k], mode)) == NULL) {
@@ -111,7 +111,17 @@ bool s8_bank_shift(char *s, size_t n, FILE *f) {
 	return (ch != EOF);
 }
 
-bool s8_bank_next(char *s, size_t n, FILE *f) {
+bool s8_bank_parallel_next(char *s, size_t n, FILE *fs[]) {
+	for(size_t k = 0; k < n; k++) {
+		int ch = fgetc(fs[k]);
+		if(ch == EOF)
+			return false;
+		s[k] = ch;
+	}
+	return true;
+}
+
+bool s8_bank_serial_next(char *s, size_t n, FILE *f) {
 	for(size_t k = 0; k < n; k++) {
 		int ch = fgetc(f);
 		if(ch == EOF)

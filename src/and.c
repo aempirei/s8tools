@@ -16,8 +16,12 @@ int main(int argc, char **argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	while(s8_bank_parallel_next(s, N, fs))
-		fwrite(s, N, 1, stdout);
+	while(s8_bank_parallel_next(s, N, fs)) {
+		int and = s[0];
+		for(size_t k = 1; k < N; k++)
+			and &= s[k];
+		putchar(and);
+	}
 
 	if(s8_io_close_all(fs, argv+1, N, "r") == -1) {
 		perror("s8_io_close_all()");
