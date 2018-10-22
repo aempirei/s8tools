@@ -18,4 +18,8 @@ int s8_io_close(FILE *, const char *, const char *);
 int s8_io_close_all(FILE *[], char *[], size_t, const char *);
 int s8_io_open_all(FILE *[], char *[], size_t, const char *);
 
+#ifdef S8_ASSIGNMENT_OPERATOR
+#include <s8-basic-function.h>
+#endif
+
 #endif
