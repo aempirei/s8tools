@@ -6,6 +6,6 @@ int main(int argc, char **argv) {
 	while((ch = getchar()) != EOF)
 		putchar(ch);
 	for(int k = 1; k < argc; k++)
-		putchar((char)atoi(argv[k]));
+		putchar(strtol(argv[k], NULL, 0));
 	exit(EXIT_SUCCESS);
 }

@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "%s failed\n", basename(argv[0]));
 		exit(EXIT_FAILURE);
 	}
-	eq = (char)atoi(argv[1]);
+	eq = (char)strtol(argv[1], NULL, 0);
 	while((ch = getchar()) != EOF)
 		putchar((char)ch == eq ? 1 : 0);
 	exit(EXIT_SUCCESS);

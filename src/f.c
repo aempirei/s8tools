@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 	char x[N];
 	int d = 1;
 
-       	*f = argc == 2 ? atoi(argv[1]) : 1;
+       	*f = argc == 2 ? strtol(argv[1], NULL, 0) : 1;
 
 	if(argc > 2 && !s8_bank_defun(f, &d, argv+1, N+1)) {
 		fprintf(stderr, "s8_bank_defun(..., %d): %s\n", (int)N+1, "failed");

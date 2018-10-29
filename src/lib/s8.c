@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <time.h>
 #include <s8.h>
 
 static inline const char *nulltoempty(const char *s) {
@@ -28,7 +29,7 @@ static inline bool strnotany(const char *s, ...) {
 	return retval;
 }
 
-static inline bool strany(const char *s, ...) {
+static bool strany(const char *s, ...) {
 	va_list ap;
 	bool retval = false;
 	const char *t;
@@ -38,6 +39,13 @@ static inline bool strany(const char *s, ...) {
 			retval = (strcmp(s, t) == 0);
 	va_end(ap);
 	return retval;
+}
+
+static bool delay() {
+	struct timespec req, rem = { 0, 1000000 };
+	do req = rem;
+	while(nanosleep(&req, &rem) == -1 && errno == EINTR);
+	return true;
 }
 
 const char *s8_io_basename() {
@@ -63,11 +71,11 @@ const char *s8_io_filename_r(char *p, size_t sz, const char *key) {
 bool s8_io_ready(const char *key, const char *mode) {
 	struct stat sb;
 	char filename[NAME_MAX];
-	if(strcmp(mode, "w") == 0) {
+	if(strany(key, "-", ".", "0", NULL)) {
+		return true;
+	} else if(strcmp(mode, "w") == 0) {
 		return true;
 	} else if(strcmp(mode, "r") == 0) {
-		if(strany(key, "-", ".", "0", NULL))
-			return true;
 		s8_io_filename_r(filename, sizeof(filename), key);
 		if(stat(filename, &sb) == -1)
 			return false;
@@ -130,16 +138,33 @@ int s8_io_close_all(FILE *f[], char *keys[], size_t n, const char *mode) {
 
 
 int s8_io_open_all(FILE *f[], char *keys[], size_t n, const char *mode) {
+
 	int e;
-	for(size_t k = 0; k < n; k++) {
-		if((f[k] = s8_io_open(keys[k], mode)) == NULL) {
-			e = errno;
-			if(k > 0)
-				s8_io_close_all(f, keys, k-1, mode);
-			errno = e;
-			return -1;
+	bool opened[n];
+	bool finished;
+
+	for(size_t k = 0; k < n; k++)
+		opened[k] = false;
+
+	do {
+		finished = true;
+		for(size_t k = 0; k < n; k++) {
+			if(!opened[k] && s8_io_ready(keys[k], mode)) {
+				if((f[k] = s8_io_open(keys[k], mode)) == NULL) {
+					e = errno;
+					for(size_t j = 0; j < n; j++)
+						if(opened[j])
+							s8_io_close(f[j], keys[j], mode);
+					errno = e;
+					return -1;
+				}
+				opened[k] = true;
+			}
+			if(!opened[k])
+				finished = false;
 		}
-	}
+	} while(!finished && delay());
+
 	return 0;
 }
 
@@ -183,7 +208,7 @@ bool s8_bank_defun(char *s, int *d, char **coefs, size_t n) {
 		return false;
 	*d = atoi(coefs[--n]);
 	for(size_t k = 0; k < n; k++)
-		s[k] = atoi(coefs[k]);
+		s[k] = strtol(coefs[k], NULL, 0);
 	return true;
 }
 
