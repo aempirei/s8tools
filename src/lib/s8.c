@@ -8,10 +8,36 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <s8.h>
 
 static inline const char *nulltoempty(const char *s) {
 	return s ? s : "";
+
+}
+
+static inline bool strnotany(const char *s, ...) {
+	va_list ap;
+	bool retval = true;
+	const char *t;
+	va_start(ap, s);
+	while((t = va_arg(ap, const char *)) != NULL)
+		if(retval)
+			retval = (strcmp(s, t) != 0);
+	va_end(ap);
+	return retval;
+}
+
+static inline bool strany(const char *s, ...) {
+	va_list ap;
+	bool retval = false;
+	const char *t;
+	va_start(ap, s);
+	while((t = va_arg(ap, const char *)) != NULL)
+		if(!retval)
+			retval = (strcmp(s, t) == 0);
+	va_end(ap);
+	return retval;
 }
 
 const char *s8_io_basename() {
@@ -32,6 +58,27 @@ const char *s8_io_filename(const char *key) {
 const char *s8_io_filename_r(char *p, size_t sz, const char *key) {
 	snprintf(p, sz, "%s%s", s8_io_basename(), key);
 	return p;
+}
+
+bool s8_io_ready(const char *key, const char *mode) {
+	struct stat sb;
+	char filename[NAME_MAX];
+	if(strcmp(mode, "w") == 0) {
+		return true;
+	} else if(strcmp(mode, "r") == 0) {
+		if(strany(key, "-", ".", "0", NULL))
+			return true;
+		s8_io_filename_r(filename, sizeof(filename), key);
+		if(stat(filename, &sb) == -1)
+			return false;
+		if((sb.st_mode & S_IFMT) != S_IFIFO) {
+			errno = ENOSTR;
+			return false;
+		}
+		return true;
+	} else {
+		return false;
+	}
 }
 
 FILE *s8_io_open(const char *key, const char *mode) {
