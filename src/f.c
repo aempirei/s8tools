@@ -15,7 +15,7 @@ static inline int clip(long int x) {
 }
 
 int main(int argc, char **argv) {
-	size_t N = argc > 2 ? argc - 2 : 1;
+	const size_t N = argc > 2 ? argc - 2 : 1;
 	char f[N];
 	char x[N];
 	int d = 1;
