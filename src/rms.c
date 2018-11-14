@@ -19,7 +19,7 @@ void output(double Sxx, double Sx, int N) {
 
 int main(int argc, char **argv) {
 
-	FILE *f = s8_io_open(argc == 1 ? "0" : argv[1], "r");
+	FILE *f = s8_io_open(argc == 1 ? "0" : argv[1], 'r');
 
 	int N = 0;
 	long Sx = 0, Sxx = 0;

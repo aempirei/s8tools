@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 	FILE *fs[N];
 	char s[N];
 
-	if(s8_io_open_all(fs, &argv[1], N, "r") == -1) {
+	if(s8_io_open_all(fs, &argv[1], N, 'r') == -1) {
 		perror("s8_io_open_all()");
 		exit(EXIT_FAILURE);
 	}
@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 	while(s8_bank_parallel_next(s, N, fs))
 		fwrite(s, N, 1, stdout);
 
-	if(s8_io_close_all(fs, argv+1, N, "r") == -1) {
+	if(s8_io_close_all(fs, argv+1, N, 'r') == -1) {
 		perror("s8_io_close_all()");
 		exit(EXIT_FAILURE);
 	}

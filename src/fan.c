@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
 	int ch;
 	size_t k = 0;
 
-	if(s8_io_open_all(f, argv + 1, N, "w") == -1) {
+	if(s8_io_open_all(f, argv + 1, N, 'w') == -1) {
 		perror("s8_io_open_all()");
 		exit(EXIT_FAILURE);
 	}
@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 		k %= N;
 	}
 
-	if(s8_io_close_all(f, argv + 1, N, "w") == -1) {
+	if(s8_io_close_all(f, argv + 1, N, 'w') == -1) {
 		perror("s8_io_close_all()");
 		exit(EXIT_FAILURE);
 	}

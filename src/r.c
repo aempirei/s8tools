@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 	FILE *f[N];
 	int ch;
 
-	if(s8_io_open_all(f, &argv[1], N, "r") == -1) {
+	if(s8_io_open_all(f, &argv[1], N, 'r') == -1) {
 		perror("s8_io_open_all()");
 		exit(EXIT_FAILURE);
 	}
@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 		while((ch = fgetc(f[k])) != EOF)
 			putchar(ch);
 
-	if(s8_io_close_all(f, argv+1, N, "r") == -1) {
+	if(s8_io_close_all(f, argv+1, N, 'r') == -1) {
 		perror("s8_io_close_all()");
 		exit(EXIT_FAILURE);
 	}

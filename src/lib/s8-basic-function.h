@@ -1,54 +1,22 @@
-#ifndef S8_ASSIGNMENT_OPERATOR
-#error "Inclusion of <s8-basic-function.h> requires the definition of S8_ASSIGNMENT_OPERATOR macro."
-#else
-#ifndef _S8_BASIC_OPERATOR_H
-#define _S8_BASIC_OPERATOR_H
+#ifndef _S8_BASIC_FUNCTION_H
+#define _S8_BASIC_FUNCTION_H 1
 
-static int parallel_mode(int argc, char **argv) {
+typedef int binary_function_t(int, int);
+typedef int bank_function_t(const char *, size_t);
 
-	const size_t N = argc - 1;
-	FILE *fs[N];
-	char x[N];
+binary_function_t binary_add;
+binary_function_t binary_mul;
+binary_function_t binary_or;
+binary_function_t binary_xor;
+binary_function_t binary_and;
+binary_function_t binary_min;
+binary_function_t binary_max;
 
-	if(s8_io_open_all(fs, argv+1, N, "r") == -1) {
-		perror("s8_io_open_all()");
-		return EXIT_FAILURE;
-	}
-	
-	while(s8_bank_parallel_next(x, N, fs)) {
+bool bind_to_fold(binary_function_t *);
 
-		int y = x[0];
+bank_function_t bank_fold;
 
-		for(size_t k = 1; k < N; k++)
-			y S8_ASSIGNMENT_OPERATOR x[k];
+int bank_function(int, char **, bank_function_t *);
+int fold_function(int, char **, binary_function_t *);
 
-		putchar(y);
-	}
-
-	if(s8_io_close_all(fs, argv+1, N, "r") == -1) {
-		perror("s8_io_close_all()");
-		return EXIT_FAILURE;
-	}
-
-	return EXIT_SUCCESS;
-}
-
-static int serial_mode(int argc, char **argv) {
-
-	const size_t N = (argc == 1) ? 2 : atoi(argv[1]);
-	char x[N];
-
-	while(s8_bank_serial_next(x, N, stdin)) {
-
-		int y = x[0];
-
-		for(size_t k = 1; k < N; k++)
-			y S8_ASSIGNMENT_OPERATOR x[k];
-
-		putchar(y);
-	}
-
-	return EXIT_SUCCESS;
-}
-#endif
 #endif

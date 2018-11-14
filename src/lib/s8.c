@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <libgen.h>
 #include <stdarg.h>
 #include <time.h>
 #include <s8.h>
@@ -68,14 +69,14 @@ const char *s8_io_filename_r(char *p, size_t sz, const char *key) {
 	return p;
 }
 
-bool s8_io_ready(const char *key, const char *mode) {
+bool s8_io_ready(const char *key, char mode) {
 	struct stat sb;
 	char filename[NAME_MAX];
 	if(strany(key, "-", ".", "0", NULL)) {
 		return true;
-	} else if(strcmp(mode, "w") == 0) {
+	} else if(mode == 'w') {
 		return true;
-	} else if(strcmp(mode, "r") == 0) {
+	} else if(mode == 'r') {
 		s8_io_filename_r(filename, sizeof(filename), key);
 		if(stat(filename, &sb) == -1)
 			return false;
@@ -89,18 +90,19 @@ bool s8_io_ready(const char *key, const char *mode) {
 	}
 }
 
-FILE *s8_io_open(const char *key, const char *mode) {
+FILE *s8_io_open(const char *key, char mode) {
+	const char mode_s[2] = { mode };
 	struct stat sb;
 	char filename[NAME_MAX];
 
 	if(strcmp(key, "-") == 0)
-		return fdopen(dup(strcmp(mode, "w") ? strcmp(mode, "r") ? STDERR_FILENO : STDIN_FILENO : STDOUT_FILENO), mode);
+		return fdopen(dup(mode != 'w' ? mode != 'r' ? STDERR_FILENO : STDIN_FILENO : STDOUT_FILENO), mode_s);
 
 	if(strcmp(key, ".") == 0)
-		return fopen("/dev/null", mode);
+		return fopen("/dev/null", mode_s);
 
 	if(strcmp(key, "0") == 0)
-		return fopen("/dev/zero", mode);
+		return fopen("/dev/zero", mode_s);
 
 	s8_io_filename_r(filename, sizeof(filename), key);
 	if(mkfifo(filename, 0700) == -1 && errno != EEXIST)
@@ -111,11 +113,11 @@ FILE *s8_io_open(const char *key, const char *mode) {
 		errno = ENOSTR;
 		return NULL;
 	}
-	return fopen(filename, mode);
+	return fopen(filename, mode_s);
 }
 
-int s8_io_close(FILE *f, const char *key, const char *mode) {
-	if(strcmp(mode, "r") == 0) {
+int s8_io_close(FILE *f, const char *key, char mode) {
+	if(mode == 'r') {
 		char filename[NAME_MAX];
 		s8_io_filename_r(filename, sizeof(filename), key);
 		unlink(filename);
@@ -123,7 +125,7 @@ int s8_io_close(FILE *f, const char *key, const char *mode) {
 	return fclose(f);
 }
 
-int s8_io_close_all(FILE *f[], char *keys[], size_t n, const char *mode) {
+int s8_io_close_all(FILE *f[], char *keys[], size_t n, char mode) {
 	int retval = 0;
 	int e = 0;
 	for(size_t k = 0; k < n; k++) {
@@ -137,7 +139,7 @@ int s8_io_close_all(FILE *f[], char *keys[], size_t n, const char *mode) {
 }
 
 
-int s8_io_open_all(FILE *f[], char *keys[], size_t n, const char *mode) {
+int s8_io_open_all(FILE *f[], char *keys[], size_t n, char mode) {
 
 	int e;
 	bool opened[n];
@@ -217,4 +219,62 @@ long int s8_bank_apply(const char *f, const char *g, int d, size_t n) {
 	for(size_t k = 0; k < n; k++)
 		x += f[k] * g[k];
 	return x / d;
+}
+
+bool s8_io_castable(enum s8_type a, enum s8_type b) {
+	if(a == b || b == s8_type_any)
+		return true;
+	switch(a) {
+		case s8_type_zero:
+			return true;
+		case s8_type_bool:
+			if(b == s8_type_sign)
+				return true;
+		case s8_type_sign:
+			if(b == s8_type_7bit)
+				return true;
+		case s8_type_7bit:
+			if(b == s8_type_signed || b == s8_type_unsigned)
+				return true;
+	}
+	return false;
+}
+
+bool s8_io_type_append(char *sig, size_t size, enum s8_type type) {
+	size_t len = strlen(sig);
+	char *p = sig + len;
+	if(len + 1 == size) {
+		errno = ENOBUFS;
+		return false;
+	}
+	*p++ = type;
+	*p = '\0';
+	return true;
+}
+
+bool s8_io_typesig_w(char *prog, char *typesig, FILE *f) {
+	return getenv("S8_TYPEINFO") == NULL || fprintf(f, "%s %d :%s\n", basename(prog), getpid(), typesig) == 3;
+}
+
+bool s8_io_typesig_r(char *prog, size_t prog_sz, int *id, char *typesig, size_t typesig_sz, FILE *f) {
+
+	char *typeinfo = getenv("S8_TYPEINFO");
+	char *p = typesig;
+	char fmt[32];
+
+	if(typeinfo == NULL)
+		return true;
+
+	snprintf(fmt, sizeof(fmt), "%%%lu[_a-z] %%d :", prog_sz);
+
+	if(fscanf(f, fmt, prog, id) != 2) 
+		return false;
+
+	if(fgets(typesig, typesig_sz - 1, f))
+		p = strpbrk(typesig, "\r\n");
+
+	if(p)
+		*p = '\0';
+
+	return true;
 }
