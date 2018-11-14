@@ -22,7 +22,6 @@ bin/fold:
 clean:
 	rm -f $(TARGETS)
 	rm -f $(FOLD_TARGETS)
-	rm -f $(OBJECTS)
 	rm -f src/lib/s8.o
 	rm -f src/lib/s8-basic-function.o
 	rmdir bin/fold
