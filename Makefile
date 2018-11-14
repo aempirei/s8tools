@@ -16,7 +16,6 @@ bin:
 clean:
 	rm -f $(TARGETS)
 	rm -f $(FOLD:%=bin/%)
-	rm -f $(FOLD:%=src/fold.%.o)
 	rm -f src/lib/s8.o
 	rm -f src/lib/s8-basic-function.o
 	rmdir bin
@@ -24,6 +23,8 @@ clean:
 src/lib/s8.o: $(wildcard src/lib/s8.[ch])
 
 src/lib/s8-basic-function.o: $(wildcard src/lib/s8-basic-function.[ch])
+
+.INTERMEDIATE: $(FOLD:%=src/fold.%.o)
 
 src/fold.%.o: src/template/fold.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -DFOLD=binary_$* -c -o $@ $<
