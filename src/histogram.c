@@ -15,9 +15,7 @@ int main() {
 	int ch;
 	while((ch = getchar()) != EOF)
 		h[ch]++;
-	for(size_t k = 0; k <= UCHAR_MAX; k++) {
+	for(ch = 0; ch <= UCHAR_MAX; ch++)
 		putchar(min(h[ch], UCHAR_MAX));
-		putchar(k);
-	}
-	return 0;
+	exit(EXIT_SUCCESS);
 }
