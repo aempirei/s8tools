@@ -9,6 +9,16 @@
 static inline long int min(long int a, long int b) {
 	return a < b ? a : b;
 }
+static inline long int max(long int a, long int b) {
+	return a > b ? a : b;
+}
+static inline long int between(long int a, long int x, long int b) {
+	return min(max(a,x),b);
+}
+
+static inline double logi2(double x) {
+	return log2(x+1)-1;
+}
 
 int main() {
 	long h[UCHAR_MAX + 1] = { 0 };
@@ -16,6 +26,6 @@ int main() {
 	while((ch = getchar()) != EOF)
 		h[ch]++;
 	for(ch = 0; ch <= UCHAR_MAX; ch++)
-		putchar(min((int)rint(ch*log2(1+h[ch])), UCHAR_MAX));
+		putchar(between(0, rint(ch * logi2(h[ch])), UCHAR_MAX));
 	exit(EXIT_SUCCESS);
 }
