@@ -7,6 +7,29 @@
 #include <s8.h>
 #include <s8-basic-function.h>
 
+#define BINARY_FUNCTION(N,O) int binary_##N(int a, int b) { return a O b; }
+
+BINARY_FUNCTION(add, +)
+BINARY_FUNCTION(mul, +)
+BINARY_FUNCTION(or, +)
+BINARY_FUNCTION(xor, +)
+BINARY_FUNCTION(and, +)
+BINARY_FUNCTION(min, +)
+BINARY_FUNCTION(max, +)
+
+#undef BINARY_FUNCTION
+
+#define BINARY_RELATION(N,R) bool cmp_##N(int a, int b) { return a R b ? 1 : 0; }
+
+BINARY_RELATION(eq, ==)
+BINARY_RELATION(ne, !=)
+BINARY_RELATION(le, <=)
+BINARY_RELATION(ge, >=)
+BINARY_RELATION(lt, <)
+BINARY_RELATION(gt, >)
+
+#undef BINARY_RELATION
+
 static int fold(const char *, size_t, binary_function_t *);
 
 static binary_function_t *fold_fp;
@@ -20,26 +43,8 @@ int bank_fold(const char *x, size_t N) {
 	return fold(x, N, fold_fp);
 }
 
-int binary_add(int a, int b) {
-	return a + b;
-}
-int binary_mul(int a, int b) {
-	return a * b;
-}
-int binary_or(int a, int b) {
-	return a | b;
-}
-int binary_xor(int a, int b) {
-	return a ^ b;
-}
-int binary_and(int a, int b) {
-	return a & b;
-}
-int binary_min(int a, int b) {
-	return a < b ? a : b;
-}
-int binary_max(int a, int b) {
-	return a > b ? a : b;
+int ordinal(const char *s) {
+	return (*s == ':') ? s[1] : strtol(s, NULL, 0);
 }
 
 static int fold(const char *x, size_t N, binary_function_t *fp) {

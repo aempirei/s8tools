@@ -5,16 +5,16 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <libgen.h>
-
+#include <s8.h>
+#include <s8-basic-function.h>
+#ifdef CMP
 int main(int argc, char **argv) {
+	const char x = argc == 2 ? ordinal(argv[1]) : 0;
 	int ch;
-	int lt;
-	if(argc != 2) {
-		fprintf(stderr, "%s failed\n", basename(argv[0]));
-		exit(EXIT_FAILURE);
-	}
-	lt = (char)strtol(argv[1], NULL, 0);
 	while((ch = getchar()) != EOF)
-		putchar((char)ch < lt ? 1 : 0);
+		putchar(CMP((char)ch, x));
 	exit(EXIT_SUCCESS);
 }
+#else
+#error "CMP macro must be defined and have type <binary_relation_t *>"
+#endif
