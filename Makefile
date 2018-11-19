@@ -29,9 +29,7 @@ clean:
 lib/libs8.a: $(LIBOBJS)
 	ar crfv $@ $^
 
-src/lib/s8.o: $(wildcard src/lib/s8.[ch])
-
-src/lib/s8-basic-function.o: $(wildcard src/lib/s8-basic-function.[ch])
+$(LIBOBJS): %.o: %.c %.h
 
 .INTERMEDIATE: $(FOLD:%=src/fold.%.o) $(CMP:%=src/cmp.%.o) $(LIBOBJS)
 
