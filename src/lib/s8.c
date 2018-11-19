@@ -62,15 +62,13 @@ static bool s8_io_key_list_delete(s8_io_key_list_t list, s8_io_key_list_ptr_t no
 	return false;
 }
 
-static void s8_io_key_list_clear(s8_io_key_list_t list) {
-	s8_io_key_list_ptr_t head = *list;
-	while(!s8_io_key_list_empty(head))
-		head = s8_io_key_list_drop(head);
-	*list = head;
+static inline void s8_io_key_list_shift(s8_io_key_list_t list) {
+	*list = s8_io_key_list_drop(*list);
 }
 
-static void s8_io_key_list_shift(s8_io_key_list_t list) {
-	*list = s8_io_key_list_drop(*list);
+static inline void s8_io_key_list_clear(s8_io_key_list_t list) {
+	while(!s8_io_key_list_empty(*list))
+		s8_io_key_list_shift(list);
 }
 
 static inline const char *nulltoempty(const char *s) {
@@ -193,7 +191,7 @@ int s8_io_close(FILE *f, const char *key, char mode) {
 		return 0;
 
 	if(s8_io_key_list_delete(&head, node) == false) {
-		fprintf("key list delete failed for node with expected key %s\n", key);
+		fprintf(stderr, "key list delete failed for node with expected key %s\n", key);
 		exit(EXIT_FAILURE);
 	}
 
