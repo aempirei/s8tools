@@ -43,3 +43,9 @@ src/cmp.%.o: src/template/cmp.c
 
 bin/%: src/%.o lib/libs8.a
 	$(CC) -o $@ $^ $(CCFLAGS)
+
+$(FOLD:%=bin/%): bin/%: src/fold.%.o lib/libs8.a
+	$(CC) -o $@ $^ $(CCFLAGS)
+
+$(CMP:%=bin/%): bin/%: src/cmp.%.o lib/libs8.a
+	$(CC) -o $@ $^ $(CCFLAGS)

@@ -13,6 +13,66 @@
 #include <time.h>
 #include <s8.h>
 
+struct s8_io_key_list;
+
+typedef struct s8_io_key_list *s8_io_key_list_ptr_t;
+typedef s8_io_key_list_ptr_t *s8_io_key_list_t;
+
+struct s8_io_key_list {
+	char *key;
+	FILE *fp;
+	s8_io_key_list_ptr_t next;
+};
+
+static s8_io_key_list_ptr_t s8_io_key_list_find(s8_io_key_list_ptr_t node, const char *key) {
+	return (node == NULL) ? NULL : (strcmp(node->key, key) == 0) ? node : s8_io_key_list_find(node->next, key);
+}
+
+static s8_io_key_list_ptr_t s8_io_key_list_new(const char *key, FILE *fp, s8_io_key_list_ptr_t next) {
+	s8_io_key_list_ptr_t node = malloc(sizeof(struct s8_io_key_list));
+	node->key = strdup(key);
+	node->fp = fp;
+	node->next = next;
+	return node;
+}
+
+static s8_io_key_list_ptr_t s8_io_key_list_unshift(s8_io_key_list_t list, const char *key, FILE *fp) {
+	return *list = s8_io_key_list_new(key, fp, *list);
+}
+
+static bool s8_io_key_list_empty(s8_io_key_list_ptr_t head) {
+	return head == NULL;
+}
+
+static s8_io_key_list_ptr_t s8_io_key_list_drop(s8_io_key_list_ptr_t head) {
+	s8_io_key_list_ptr_t next = head->next;
+	free(head->key);
+	free(head);
+	return next;
+}
+
+static bool s8_io_key_list_delete(s8_io_key_list_t list, s8_io_key_list_ptr_t node) {
+	s8_io_key_list_ptr_t next = s8_io_key_list_drop(node);
+	while(*list != NULL && *list != node)
+		list = &((*list)->next);
+	if(*list == node) {
+		*list = next;
+		return true;
+	}
+	return false;
+}
+
+static void s8_io_key_list_clear(s8_io_key_list_t list) {
+	s8_io_key_list_ptr_t head = *list;
+	while(!s8_io_key_list_empty(head))
+		head = s8_io_key_list_drop(head);
+	*list = head;
+}
+
+static void s8_io_key_list_shift(s8_io_key_list_t list) {
+	*list = s8_io_key_list_drop(*list);
+}
+
 static inline const char *nulltoempty(const char *s) {
 	return s ? s : "";
 
@@ -92,19 +152,26 @@ bool s8_io_ready(const char *key, char mode) {
 	}
 }
 
+static s8_io_key_list_ptr_t head = NULL;
+
 FILE *s8_io_open(const char *key, char mode) {
+	s8_io_key_list_ptr_t node;
+
 	const char mode_s[2] = { mode };
 	struct stat sb;
 	char filename[NAME_MAX];
 
+	if((node = s8_io_key_list_find(head, key)))
+		return node->fp;
+
 	if(strcmp(key, "-") == 0)
-		return fdopen(dup(mode != 'w' ? mode != 'r' ? STDERR_FILENO : STDIN_FILENO : STDOUT_FILENO), mode_s);
+		return s8_io_key_list_unshift(&head, key, fdopen(dup(mode != 'w' ? mode != 'r' ? STDERR_FILENO : STDIN_FILENO : STDOUT_FILENO), mode_s))->fp;
 
 	if(strcmp(key, ".") == 0)
-		return fopen("/dev/null", mode_s);
+		return s8_io_key_list_unshift(&head, key, fopen("/dev/null", mode_s))->fp;
 
 	if(strcmp(key, "0") == 0)
-		return fopen("/dev/zero", mode_s);
+		return s8_io_key_list_unshift(&head, key, fopen("/dev/zero", mode_s))->fp;
 
 	s8_io_filename_r(filename, sizeof(filename), key);
 	if(mkfifo(filename, 0700) == -1 && errno != EEXIST)
@@ -115,10 +182,21 @@ FILE *s8_io_open(const char *key, char mode) {
 		errno = ENOSTR;
 		return NULL;
 	}
-	return fopen(filename, mode_s);
+	return s8_io_key_list_unshift(&head, key, fopen(filename, mode_s))->fp;
 }
 
 int s8_io_close(FILE *f, const char *key, char mode) {
+
+	s8_io_key_list_ptr_t node = s8_io_key_list_find(head, key);
+
+	if(node == NULL)
+		return 0;
+
+	if(s8_io_key_list_delete(&head, node) == false) {
+		fprintf("key list delete failed for node with expected key %s\n", key);
+		exit(EXIT_FAILURE);
+	}
+
 	if(mode == 'r') {
 		char filename[NAME_MAX];
 		if(s8_io_filename_r(filename, sizeof(filename), key) != NULL)
