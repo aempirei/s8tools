@@ -5,20 +5,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <libgen.h>
-
-static inline int ordinal(const char *s) {
-	return (*s == ':') ? s[1] : strtol(s, NULL, 0);
-}
-
+#include <s8-basic-function.h>
 int main(int argc, char **argv) {
+	const int x = argc == 2 ? ordinal(argv[1]) : 0;
 	int ch;
-	int rot;
-	if(argc != 2) {
-		fprintf(stderr, "%s failed\n", basename(argv[0]));
-		exit(EXIT_FAILURE);
-	}
-	rot = ordinal(argv[1]);
 	while((ch = getchar()) != EOF)
-		putchar(ch + rot);
+		putchar(binary_add(ch,x));
 	exit(EXIT_SUCCESS);
 }

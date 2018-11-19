@@ -5,7 +5,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <libgen.h>
-#include <s8.h>
 #include <s8-basic-function.h>
 #ifdef CMP
 int main(int argc, char **argv) {

@@ -10,12 +10,12 @@
 #define BINARY_FUNCTION(N,O) int binary_##N(int a, int b) { return a O b; }
 
 BINARY_FUNCTION(add, +)
-BINARY_FUNCTION(mul, +)
-BINARY_FUNCTION(or, +)
-BINARY_FUNCTION(xor, +)
-BINARY_FUNCTION(and, +)
-BINARY_FUNCTION(min, +)
-BINARY_FUNCTION(max, +)
+BINARY_FUNCTION(mul, *)
+BINARY_FUNCTION(or, |)
+BINARY_FUNCTION(xor, ^)
+BINARY_FUNCTION(and, &)
+BINARY_FUNCTION(min, < b ? a :)
+BINARY_FUNCTION(max, > b ? a :)
 
 #undef BINARY_FUNCTION
 

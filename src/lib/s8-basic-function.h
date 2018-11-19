@@ -1,6 +1,8 @@
 #ifndef _S8_BASIC_FUNCTION_H
 #define _S8_BASIC_FUNCTION_H 1
 
+#include <stdbool.h>
+
 typedef bool binary_relation_t(int, int);
 typedef int binary_function_t(int, int);
 typedef int bank_function_t(const char *, size_t);
