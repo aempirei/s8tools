@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "%s failed\n", basename(argv[0]));
 		exit(EXIT_FAILURE);
 	}
-	rot = atoi(argv[1]);
+	rot = strtol(argv[1], NULL, 0);
 	while((ch = getchar()) != EOF)
 		putchar(ch + rot);
 	exit(EXIT_SUCCESS);

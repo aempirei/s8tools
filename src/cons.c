@@ -11,7 +11,7 @@
 
 static inline int ifarg(size_t n, size_t argc, char **argv, int retval, int min, int max) {
 	if(argc > n)
-		retval = atoi(argv[n]);
+		retval = strtol(argv[n], NULL, 0);
 	return retval < min ? min : retval > max ? max : retval;
 }
 

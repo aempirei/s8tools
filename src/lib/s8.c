@@ -65,6 +65,8 @@ const char *s8_io_filename(const char *key) {
 }
 
 const char *s8_io_filename_r(char *p, size_t sz, const char *key) {
+	if(strany(key, "-", ".", "0", NULL))
+		return NULL;
 	snprintf(p, sz, "%s%s", s8_io_basename(), key);
 	return p;
 }
@@ -119,8 +121,8 @@ FILE *s8_io_open(const char *key, char mode) {
 int s8_io_close(FILE *f, const char *key, char mode) {
 	if(mode == 'r') {
 		char filename[NAME_MAX];
-		s8_io_filename_r(filename, sizeof(filename), key);
-		unlink(filename);
+		if(s8_io_filename_r(filename, sizeof(filename), key) != NULL)
+			unlink(filename);
 	}
 	return fclose(f);
 }
