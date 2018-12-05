@@ -6,6 +6,15 @@ int main(int argc, char **argv) {
 	const char *fmt = argc > 1 ? argv[1] : "s";
 	const char *p = fmt;
 	int ch;
+	char gayass[] = "XXXXmother fucking faggots!";
+	struct bob {
+		char s[0];
+		int gay;
+	} *alice = (struct bob *)gayass;
+
+	printf("sizeof bob = %ld\n", sizeof(alice));
+	printf("alice->gay = %d\n", alice->gay);
+	printf("alice->s = %s\n", alice->s);
 
 	for(const char *q = fmt; *q; q++) {
 		if(strchr("su+", *q) == NULL) {
