@@ -15,18 +15,20 @@
 #define REG(X)		register_file[REGNUM(X)]
 #define R(X)		register_file[REGCNUM(X)]
 
-#define OPCODE(NAME, INFIX_SYM)		long NAME##_instruction(long x, long y) { return ( x INFIX_SYM y ); }
-#define OPENTRY(NAME, INFIX_CHR)	{ INFIX_CHR, NAME##_instruction }
-#define OPENTRY_END			{ '\0', NULL }
+#define OPSIG(NAME)			long NAME##_instruction(long x, long y)
+#define OPCODE(NAME, INFIX_SYM)		OPSIG(NAME) { return ( x INFIX_SYM y ); }
+#define OPENTRY(NAME, INFIX_CHR)	{ INFIX_CHR, #NAME, NAME##_instruction }
+#define OPENTRY_END			{ '\0', NULL, NULL }
 
 typedef long op_t(long, long);
 
-typedef struct {
+typedef struct instruction {
 	char symbol;
+	const char *name;
 	op_t *op;
 } instruction_t;
 
-typedef struct {
+typedef struct code {
 	const instruction_t *instruction_ptr;
 	char reg;
 	bool is_immediate;
@@ -36,17 +38,29 @@ typedef struct {
 long register_file[26];
 
 OPCODE(add, +)
+OPCODE(sub, -)
 OPCODE(mul, *)
+OPCODE(div, /)
+OPCODE(mod, %)
 OPCODE(and, &)
 OPCODE(xor, ^)
 OPCODE(or, |)
+OPCODE(mov, =)
+OPSIG(min) { return x < y ? x : y; }
+OPSIG(max) { return x > y ? x : y; }
 
 const instruction_t instruction_set[] = {
 	OPENTRY(add, '+'),
+	OPENTRY(sub, '-'),
 	OPENTRY(mul, '*'),
+	OPENTRY(div, '/'),
+	OPENTRY(mod, '%'),
 	OPENTRY(and, '&'),
 	OPENTRY(xor, '^'),
 	OPENTRY(or, '|'),
+	OPENTRY(mov, '='),
+	OPENTRY(min, '<'),
+	OPENTRY(max, '>'),
 	OPENTRY_END
 };
 
@@ -67,22 +81,21 @@ size_t count_instructions(const char *s) {
 
 code_t *parse_code(const char *s) {
 
-	size_t num_instructions = count_instructions(s);
-	size_t ip = 0;
-	code_t *code = malloc(num_instructions * sizeof(code_t));
-	const char *p = s;
+	size_t num_ops = count_instructions(s);
+	code_t *code = malloc((num_ops + 1) * sizeof(code_t));
+	memset(code, 0, (num_ops + 1) * sizeof(code_t));
 
-	while(*p) {
-		code[ip].instruction_ptr = lookup_instruction(*p++);
-		if(!*p) goto failure;
-		code[ip].reg = toupper(*p++);
-		if(!*p) goto failure;
-		if((code[ip].is_immediate = !isalpha(*p))) {
-			char *q;
-			code[ip].operand = strtol(p, &q, 0);
-			p = q;
+	for(code_t *cp = code; *s; cp++) {
+		cp->instruction_ptr = lookup_instruction(*s++);
+		if(!*s) goto failure;
+		cp->reg = toupper(*s++);
+		if(!*s) goto failure;
+		if((cp->is_immediate = !isalpha(*s))) {
+			char *t;
+			cp->operand = strtol(s, &t, 0);
+			s = t;
 		} else {
-			code[ip].operand = toupper(*p++);
+			cp->operand = toupper(*s++);
 		}
 	}
 
@@ -90,6 +103,19 @@ code_t *parse_code(const char *s) {
 failure:
 	free(code);
 	return NULL;
+}
+
+void print_code(code_t *code) {
+	for(size_t n = 0; code[n].instruction_ptr != NULL; n++) {
+		const char *N = code[n].instruction_ptr->name;
+		char R = code[n].reg;
+		char F = code[n].instruction_ptr->symbol;
+		long O = code[n].operand;
+		if(code[n].is_immediate)
+			printf("[%02lx] %3s %c, %-5ld ;  %c := %c %c %ld\n", n, N, R, O, R, R, F, O);
+		else
+			printf("[%02lx] %3s %c, %-5c ;  %c := %c %c %c\n", n, N, R, (char)O, R, R, F, (char)O);
+	}
 }
 
 void run_code(code_t *code, int ch) {
@@ -102,14 +128,20 @@ int main(int argc, char *argv[]) {
 
 	int ch;
 
-	code_t *code = argc == 2 ? parse_code(argv[1]) : NULL;
+	code_t *code = parse_code(argc == 1 ? "" : argv[1]);
 
 	memset(register_file, 0, sizeof(register_file));
 
-	while((ch = getchar()) != EOF)
-		run_code(code, ch);
+	if(argc > 2 && strcmp(argv[2], "--disasm") == 0) {
+		print_code(code);
+	} else {
+		if(false) {
+			while((ch = getchar()) != EOF)
+				run_code(code, ch);
 
-	putchar(REG(Y));
+			putchar(REG(Y));
+		}
+	}
 
 	free(code);
 
