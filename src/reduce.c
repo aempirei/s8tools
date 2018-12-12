@@ -119,7 +119,13 @@ void print_code(code_t *code) {
 }
 
 void run_code(code_t *code, int ch) {
+
 	REG(X) = ch;
+
+	for(char r = 'A'; r <= 'Z'; r++)
+		printf("%4lx ", R(r));
+	putchar('\n');
+
 	for(code_t *cp = code; cp->instruction_ptr != NULL; cp++)
 		R(cp->reg) = (cp->instruction_ptr->op)(R(cp->reg), cp->is_immediate ? cp->operand : R(cp->operand));
 }
@@ -132,16 +138,28 @@ int main(int argc, char *argv[]) {
 
 	memset(register_file, 0, sizeof(register_file));
 
-	if(argc > 2 && strcmp(argv[2], "--disasm") == 0) {
-		print_code(code);
-	} else {
-		if(false) {
-			while((ch = getchar()) != EOF)
-				run_code(code, ch);
+	puts("PROGRAM CODE DISASSEMBLY");
+	print_code(code);
 
-			putchar(REG(Y));
-		}
-	}
+	puts("REGISTER FILE STATE");
+	for(char r = 'A'; r <= 'Z'; r++)
+		printf("%4c ", r);
+	putchar('\n');
+
+	while((ch = getchar()) != EOF)
+		run_code(code, ch);
+
+	putchar('\n');
+	for(char r = 'A'; r <= 'Z'; r++)
+		printf("%4c ", r);
+	putchar('\n');
+	for(char r = 'A'; r <= 'Z'; r++)
+		printf("%4lx ", R(r));
+	putchar('\n');
+
+
+
+	putchar(REG(Y));
 
 	free(code);
 
