@@ -286,7 +286,7 @@ bool s8_bank_serial_next(char *s, size_t n, FILE *f) {
 bool s8_bank_defun(char *s, int *d, char **coefs, size_t n) {
 	if(n < 2 || s == NULL || d == NULL || coefs == NULL)
 		return false;
-	*d = atoi(coefs[--n]);
+	*d = strtol(coefs[--n], NULL, 0);
 	for(size_t k = 0; k < n; k++)
 		s[k] = strtol(coefs[k], NULL, 0);
 	return true;
