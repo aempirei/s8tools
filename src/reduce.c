@@ -105,26 +105,36 @@ failure:
 	return NULL;
 }
 
-void print_code(code_t *code) {
+void print_code(code_t *code, FILE *fp) {
 	for(size_t n = 0; code[n].instruction_ptr != NULL; n++) {
 		const char *N = code[n].instruction_ptr->name;
 		char R = code[n].reg;
 		char F = code[n].instruction_ptr->symbol;
 		long O = code[n].operand;
 		if(code[n].is_immediate)
-			printf("[%02lx] %3s %c, %-5ld ;  %c := %c %c %ld\n", n, N, R, O, R, R, F, O);
+			fprintf(fp,"[%02lx] %3s %c, %-5ld ;  %c := %c %c %ld\n", n, N, R, O, R, R, F, O);
 		else
-			printf("[%02lx] %3s %c, %-5c ;  %c := %c %c %c\n", n, N, R, (char)O, R, R, F, (char)O);
+			fprintf(fp,"[%02lx] %3s %c, %-5c ;  %c := %c %c %c\n", n, N, R, (char)O, R, R, F, (char)O);
 	}
+}
+
+void print_register_names(FILE *fp) {
+	for(char r = 'A'; r <= 'Z'; r++)
+		fprintf(fp,"%4c ", r);
+	fputc('\n',fp);
+}
+
+void print_register_values(FILE *fp) {
+	for(char r = 'A'; r <= 'Z'; r++)
+		fprintf(fp, "%4lx ", R(r));
+	fputc('\n',fp);
 }
 
 void run_code(code_t *code, int ch) {
 
 	REG(X) = ch;
 
-	for(char r = 'A'; r <= 'Z'; r++)
-		printf("%4lx ", R(r));
-	putchar('\n');
+	print_register_values(stderr);
 
 	for(code_t *cp = code; cp->instruction_ptr != NULL; cp++)
 		R(cp->reg) = (cp->instruction_ptr->op)(R(cp->reg), cp->is_immediate ? cp->operand : R(cp->operand));
@@ -138,25 +148,19 @@ int main(int argc, char *argv[]) {
 
 	memset(register_file, 0, sizeof(register_file));
 
-	puts("PROGRAM CODE DISASSEMBLY");
-	print_code(code);
+	fputs("PROGRAM CODE DISASSEMBLY\n",stderr);
+	print_code(code,stderr);
 
-	puts("REGISTER FILE STATE");
-	for(char r = 'A'; r <= 'Z'; r++)
-		printf("%4c ", r);
-	putchar('\n');
+	fputs("REGISTER FILE STATE\n",stderr);
+	print_register_names(stderr);
 
 	while((ch = getchar()) != EOF)
 		run_code(code, ch);
 
-	putchar('\n');
-	for(char r = 'A'; r <= 'Z'; r++)
-		printf("%4c ", r);
-	putchar('\n');
-	for(char r = 'A'; r <= 'Z'; r++)
-		printf("%4lx ", R(r));
-	putchar('\n');
+	fputc('\n', stderr);
 
+	print_register_names(stderr);
+	print_register_values(stderr);
 
 
 	putchar(REG(Y));
