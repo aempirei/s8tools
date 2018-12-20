@@ -37,6 +37,8 @@ typedef struct code {
 
 long register_file[26];
 
+bool debug;
+
 OPCODE(add, +)
 OPCODE(sub, -)
 OPCODE(mul, *)
@@ -134,36 +136,41 @@ void run_code(code_t *code, int ch) {
 
 	REG(X) = ch;
 
-	print_register_values(stderr);
-
 	for(code_t *cp = code; cp->instruction_ptr != NULL; cp++)
 		R(cp->reg) = (cp->instruction_ptr->op)(R(cp->reg), cp->is_immediate ? cp->operand : R(cp->operand));
+
+	if(debug)
+		print_register_values(stderr);
+
+	if(REG(B) != 0)
+		putchar(REG(A));
 }
 
 int main(int argc, char *argv[]) {
 
 	int ch;
 
+	debug = (argc > 2);
+
 	code_t *code = parse_code(argc == 1 ? "" : argv[1]);
 
 	memset(register_file, 0, sizeof(register_file));
 
-	fputs("PROGRAM CODE DISASSEMBLY\n",stderr);
-	print_code(code,stderr);
-
-	fputs("REGISTER FILE STATE\n",stderr);
-	print_register_names(stderr);
+	if(debug) {
+		fputs("PROGRAM CODE DISASSEMBLY\n",stderr);
+		print_code(code,stderr);
+		fputs("REGISTER FILE STATE\n",stderr);
+		print_register_names(stderr);
+	}
 
 	while((ch = getchar()) != EOF)
 		run_code(code, ch);
 
-	fputc('\n', stderr);
+	if(debug)
+		print_register_names(stderr);
 
-	print_register_names(stderr);
-	print_register_values(stderr);
-
-
-	putchar(REG(Y));
+	if(REG(Z) != 0)
+		putchar(REG(Y));
 
 	free(code);
 
