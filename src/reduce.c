@@ -39,6 +39,8 @@ bool debug;
 
 long register_file[26];
 
+bool debug;
+
 OPCODE(add, +)
 OPCODE(sub, -)
 OPCODE(mul, *)
@@ -136,18 +138,21 @@ void run_code(code_t *code, int ch) {
 
 	REG(X) = ch;
 
+	for(code_t *cp = code; cp->instruction_ptr != NULL; cp++)
+		R(cp->reg) = (cp->instruction_ptr->op)(R(cp->reg), cp->is_immediate ? cp->operand : R(cp->operand));
+
 	if(debug)
 		print_register_values(stderr);
 
-	for(code_t *cp = code; cp->instruction_ptr != NULL; cp++)
-		R(cp->reg) = (cp->instruction_ptr->op)(R(cp->reg), cp->is_immediate ? cp->operand : R(cp->operand));
+	if(REG(B) != 0)
+		putchar(REG(A));
 }
 
 int main(int argc, char *argv[]) {
 
 	int ch;
 
-	debug = getenv("S8_DEBUG") != NULL;
+	debug = (argc > 2);
 
 	code_t *code = parse_code(argc == 1 ? "" : argv[1]);
 
@@ -164,14 +169,11 @@ int main(int argc, char *argv[]) {
 	while((ch = getchar()) != EOF)
 		run_code(code, ch);
 
-	if(debug) {
-		fputc('\n', stderr);
-
+	if(debug)
 		print_register_names(stderr);
-		print_register_values(stderr);
-	}
 
-	putchar(REG(Y));
+	if(REG(Z) != 0)
+		putchar(REG(Y));
 
 	free(code);
 

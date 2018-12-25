@@ -21,13 +21,21 @@ binary_function_t binary_xor;
 binary_function_t binary_and;
 binary_function_t binary_min;
 binary_function_t binary_max;
+binary_function_t binary_avg;
 
-bool bind_to_fold(binary_function_t *);
+binary_function_t *binary_add_final;
+binary_function_t *binary_mul_final;
+binary_function_t *binary_or_final;
+binary_function_t *binary_xor_final;
+binary_function_t *binary_and_final;
+binary_function_t *binary_min_final;
+binary_function_t *binary_max_final;
+binary_function_t *binary_avg_final;
 
 bank_function_t bank_fold;
 
 int bank_function(int, char **, bank_function_t *);
-int fold_function(int, char **, binary_function_t *);
+int fold_function(int, char **, binary_function_t *, binary_function_t *);
 
 int ordinal(const char *);
 

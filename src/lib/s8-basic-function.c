@@ -16,8 +16,28 @@ BINARY_FUNCTION(xor, ^)
 BINARY_FUNCTION(and, &)
 BINARY_FUNCTION(min, < b ? a :)
 BINARY_FUNCTION(max, > b ? a :)
+BINARY_FUNCTION(avg, +)
 
 #undef BINARY_FUNCTION
+
+static binary_function_t final_div_1;
+static binary_function_t final_div_n;
+
+#define FINAL_FUNCTION(N) int final_div_##N(int x, int n) { return (n == N && n == 0) ? x : x / N; }
+
+FINAL_FUNCTION(1);
+FINAL_FUNCTION(n);
+
+#undef FINAL_FUNCTION
+
+binary_function_t *binary_add_final = final_div_1;
+binary_function_t *binary_mul_final = final_div_1;
+binary_function_t *binary_or_final = final_div_1;
+binary_function_t *binary_xor_final = final_div_1;
+binary_function_t *binary_and_final = final_div_1;
+binary_function_t *binary_min_final = final_div_1;
+binary_function_t *binary_max_final = final_div_1;
+binary_function_t *binary_avg_final = final_div_n;
 
 #define BINARY_RELATION(N,R) bool cmp_##N(int a, int b) { return a R b ? 1 : 0; }
 
@@ -30,17 +50,20 @@ BINARY_RELATION(gt, >)
 
 #undef BINARY_RELATION
 
+static bool bind_to_fold(binary_function_t *, binary_function_t *);
 static int fold(const char *, size_t, binary_function_t *);
 
-static binary_function_t *fold_fp;
+static binary_function_t *bound_binary_fp;
+static binary_function_t *bound_final_fp;
 
-bool bind_to_fold(binary_function_t *f) {
-	fold_fp = f;
-	return f != NULL;
+static bool bind_to_fold(binary_function_t *f, binary_function_t *g) {
+	bound_binary_fp = f;
+	bound_final_fp = g;
+	return f != NULL && g != NULL;
 }
 
 int bank_fold(const char *x, size_t N) {
-	return fold(x, N, fold_fp);
+	return (*bound_final_fp)(fold(x, N, bound_binary_fp), N);
 }
 
 int ordinal(const char *s) {
@@ -58,8 +81,8 @@ static int fold(const char *x, size_t N, binary_function_t *fp) {
 	}
 }
 
-int fold_function(int argc, char **argv, binary_function_t *binary_fp) {
-	bind_to_fold(binary_fp);
+int fold_function(int argc, char **argv, binary_function_t *binary_fp, binary_function_t *final_fp) {
+	bind_to_fold(binary_fp, final_fp);
 	return bank_function(argc, argv, bank_fold);
 }
 
