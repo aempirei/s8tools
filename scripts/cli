@@ -1,0 +1,18 @@
+#!/bin/bash
+
+cd "`dirname "$0"`/.."
+
+export S8BIND=`realpath "$PWD/bin"`
+export PATH=$S8BIND:$PATH
+
+cat <<__MSG__
+
+****************************************
+* ENTERING BASH SHELL FOR S8 TOOLS CLI *
+****************************************
+
+__MSG__
+
+export PS1="[S8] \w \$ "
+
+bash --norc
