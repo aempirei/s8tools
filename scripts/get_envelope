@@ -4,4 +4,4 @@ cd "`dirname "$0"`/.."
 
 PATH=$PWD/bin:$PATH
 let width="$1"
-cons "$width" | w min max | r min | min "$width" | cons "$width" | mean "$width" | w l | r max | max "$width" | cons "$width" | mean "$width" | w r | mux l r
+cons "$width" | w min max | r min | min "$width" | cons "$width" | avg "$width" | w l | r max | max "$width" | cons "$width" | avg "$width" | w r | mux l r
