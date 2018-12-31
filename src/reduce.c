@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <ctype.h>
+#include <s8.h>
 
 #define REGCNUM(C)	(toupper(C)-'A')
 #define REGSNUM(S)	REGCNUM(*(S))
@@ -37,9 +38,8 @@ typedef struct code {
 
 bool debug;
 
+long loop_num;
 long register_file[26];
-
-bool debug;
 
 OPCODE(add, +)
 OPCODE(sub, -)
@@ -123,20 +123,25 @@ void print_code(code_t *code, FILE *fp) {
 }
 
 void print_register_names(FILE *fp) {
-	for(char r = 'A'; r <= 'Z'; r++)
-		fprintf(fp,"%4c ", r);
+	for(char r = 'A'; r <= 'Z'; r++) fprintf(fp,"%4c ", r);
 	fputc('\n',fp);
 }
 
 void print_register_values(FILE *fp) {
-	for(char r = 'A'; r <= 'Z'; r++)
-		fprintf(fp, "%4lx ", R(r));
+	for(char r = 'A'; r <= 'Z'; r++) fprintf(fp, "%4lx ", R(r));
 	fputc('\n',fp);
 }
 
-void run_code(code_t *code, int ch) {
+void run_code(code_t *code, char *x, size_t N, FILE *fp) {
 
-	REG(X) = ch;
+	REG(N) = N;
+	int c = fgetc(fp);
+	REG(Z) = feof(fp) ? 1 : 0;
+	ungetc(c,fp);
+	REG(Q) = loop_num++;
+
+	for(size_t n = 0; n < N; n++)
+		R('A' + n) = x[n];
 
 	for(code_t *cp = code; cp->instruction_ptr != NULL; cp++)
 		R(cp->reg) = (cp->instruction_ptr->op)(R(cp->reg), cp->is_immediate ? cp->operand : R(cp->operand));
@@ -144,17 +149,18 @@ void run_code(code_t *code, int ch) {
 	if(debug)
 		print_register_values(stderr);
 
-	if(REG(B) != 0)
-		putchar(REG(A));
+	if(REG(O) != 0)
+		putchar(REG(P));
 }
 
 int main(int argc, char *argv[]) {
 
-	int ch;
+	const size_t N = argc > 1 ? strtoul(argv[1], NULL, 0) : 1;
+	char x[N];
 
-	debug = (argc > 2);
+	code_t *code = parse_code(argc > 2 ? argv[2] : "");
 
-	code_t *code = parse_code(argc == 1 ? "" : argv[1]);
+	debug = argc > 3;
 
 	memset(register_file, 0, sizeof(register_file));
 
@@ -166,14 +172,13 @@ int main(int argc, char *argv[]) {
 		print_register_names(stderr);
 	}
 
-	while((ch = getchar()) != EOF)
-		run_code(code, ch);
+	loop_num = 0;
+
+	while(s8_bank_serial_next(x, N, stdin))
+		run_code(code, x, N, stdin);
 
 	if(debug)
 		print_register_names(stderr);
-
-	if(REG(Z) != 0)
-		putchar(REG(Y));
 
 	free(code);
 
