@@ -1,45 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <assert.h>
+#include <s8-helpers.h>
 
-#define MSB 3
-#define LSB (8 - (MSB))
-#define LSB_MASK ((1 << (LSB)) - 1)
+size_t runout(unsigned long run, int ch) {
 
-const unsigned char msb = MSB;
-const unsigned char lsb = LSB;
+	if(run == 0)
+		return 0;
 
-const unsigned char lsb_mask = LSB_MASK;
-const unsigned char msb_mask = (~0) ^ LSB_MASK;
+	unsigned char ll8 = to_ll8(run);
+	unsigned long done = from_ll8(ll8);
 
-size_t runout(size_t run, int ch) {
-	if(run == 0) {
-		/* nop */
-	} else if(run < msb_mask) {
-		putchar(run);
-		putchar(ch);
-	} else {
-		size_t expart = run - (msb_mask - 1);
-		int ex = -1;
-		while(expart) {
-			expart >>= 1;
-			ex++;
-		}
-		if(ex > lsb_mask)
-			ex = lsb_mask;
-		size_t rundone = (msb_mask - 1) + (1 << ex);
-		putchar(msb_mask | ex);
-		putchar(ch);
-		runout(run - rundone, ch);
-	}
-	return run;
+	putchar(ll8);
+	putchar(ch);
+
+	assert(done <= run);
+
+	return done + runout(run - done, ch);
 }
 
 int main() {
 
 	int ch;
 	int pch = getchar();
-	size_t run = 1;
+	unsigned long run = 1;
 
 	while((ch = getchar()) != EOF) {
 		if(ch != pch) {
