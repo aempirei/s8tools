@@ -1,19 +1,10 @@
+#include <limits.h>
+#include <stdint.h>
 #include <s8-helpers.h>
 
-#define POW2(N)		(1<<(N))
-#define BITMASK(N)	(POW2(N)-1)
-#define MSB		(3)
-#define LSB		(8-(MSB))
-#define LSB_MASK	BITMASK(LSB)
-#define MSB_MASK	(BITMASK(MSB)<<LSB)
-#define LINEAR_MAX	(MSB_MASK-1)
-#define IS_LINEAR(X)	((X) <= LINEAR_MAX)
-#define EXPONENT(X)	((X) & LSB_MASK)
-#define EXP_PART(X)	POW2(EXPONENT(X))
+#define HALF_MAX_BIT    (sizeof(uint32_t) * 4)
 
-#define HALF_MAX_BIT    (sizeof(unsigned long) * 4)
-
-static int highest_bit(unsigned long n) {
+static int highest_bit(uint32_t n) {
         int bit = -1;
         for(int k = HALF_MAX_BIT; k > 0; k>>=1) {
                 if(n >> k) {
@@ -24,18 +15,67 @@ static int highest_bit(unsigned long n) {
         return bit + n;
 }
 
-DECL_FROM(ll8,x) {
-	return IS_LINEAR(x) ? x : (LINEAR_MAX + EXP_PART(x));
+unsigned char to_ullcomp(long x) {
+	const int hibits = 3;
+	const int lobits = 5;
+	const int himask = ((1 << hibits) - 1) << lobits;
+	const int lomask = ((1 << lobits) - 1);
+	const int linear_max = himask - 1;
+	if(x <= 0)
+		return 0;
+	if(x <= linear_max)
+		return x;
+	return himask | (highest_bit(x - linear_max) & lomask);
+}
+unsigned char to_sllcomp(long x) {
+	const int hibits = 2;
+	const int lobits = 5;
+	const int himask = ((1 << hibits) - 1) << lobits;
+	const int lomask = ((1 << lobits) - 1);
+	const int signbit = (1 << 7);
+	const int linear_max = himask - 1;
+	unsigned char y;
+	if(x == 0)
+		return 0;
+	if(x < 0) {
+		x = -x;
+		y = signbit;
+	} else {
+		y = 0;
+	}
+	if(x <= linear_max)
+		return y | linear_max;
+	return y | himask | (highest_bit(x - linear_max) & lomask);
+}
+signed char to_sclip(long x) {
+	return (x < SCHAR_MIN) ? SCHAR_MIN : (x > SCHAR_MAX) ? SCHAR_MAX : x;
+}
+unsigned char to_uclip(long x) {
+	return (x < 0) ? 0 : (x > UCHAR_MAX) ? UCHAR_MAX : x;
 }
 
-DECL_TO(ll8,y) {
-	return IS_LINEAR(y) ? y : (MSB_MASK | (highest_bit(y - LINEAR_MAX) & LSB_MASK));
+long from_ullcomp(unsigned char x) {
+	const int hibits = 3;
+	const int lobits = 5;
+	const int himask = ((1 << hibits) - 1) << lobits;
+	const int lomask = ((1 << lobits) - 1);
+	const int linear_max = himask - 1;
+	return ((x & himask) == himask) ? (linear_max + (1 << (x & lomask))) : x;
 }
-
-DECL_FROM(5b2,x) {
+long from_sllcomp(unsigned char x) {
+	const int hibits = 2;
+	const int lobits = 5;
+	const int himask = ((1 << hibits) - 1) << lobits;
+	const int lomask = ((1 << lobits) - 1);
+	const int signbit = (1 << 7);
+	const int linear_max = himask - 1;
+	int sign = (x & signbit) ? -1 : 1;
+	x &= ~signbit;
+	return sign * (((x & himask) == himask) ? (linear_max + (1 << (x & lomask))) : x);
+}
+long from_sclip(signed char x) {
 	return x;
 }
-
-DECL_TO(5b2,y) {
-	return y;
+long from_uclip(unsigned char x) {
+	return x;
 }

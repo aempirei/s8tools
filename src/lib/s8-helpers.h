@@ -3,13 +3,14 @@
 
 #include <stdbool.h>
 
-#define DECL_FROM(X,...)	unsigned long from_##X(unsigned char __VA_ARGS__)
-#define DECL_TO(X,...)		unsigned char to_##X(unsigned long __VA_ARGS__)
+unsigned char to_ullcomp(long);
+unsigned char to_sllcomp(long);
+signed char to_sclip(long);
+unsigned char to_uclip(long);
 
-#define DECL_PAIR(X) DECL_TO(X);DECL_FROM(X)
-
-DECL_PAIR(ll8);
-DECL_PAIR(5b2);
-DECL_PAIR(nop);
+long from_ullcomp(unsigned char);
+long from_sllcomp(unsigned char);
+long from_sclip(signed char);
+long from_uclip(unsigned char);
 
 #endif

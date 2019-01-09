@@ -9,8 +9,8 @@ size_t runout(unsigned long run, int ch) {
 	if(run == 0)
 		return 0;
 
-	unsigned char ll8 = to_ll8(run);
-	unsigned long done = from_ll8(ll8);
+	unsigned char ll8 = to_ullcomp(run);
+	unsigned long done = from_ullcomp(ll8);
 
 	putchar(ll8);
 	putchar(ch);
