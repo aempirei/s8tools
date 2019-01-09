@@ -7,17 +7,27 @@
 #include <unistd.h>
 
 int main() {
-	const size_t sz = 1 << 20;
-	char *s, *p;
+	size_t sz = 1 << 16;
+	size_t done = 0;
+	char *s;
 	int ch;
-	if((s = p = malloc(sz)) == NULL) {
+	if((s = malloc(sz)) == NULL) {
 		perror("malloc()");
 		return -1;
 	}
-	while((ch = getchar()) != EOF && p < s + sz)
-		*p++ = ch;
-	while(p-- > s)
-		putchar(*p);
+	while((ch = getchar()) != EOF) {
+		s[done++] = ch;
+		if(done == sz) {
+			sz <<= 1;
+			s = realloc(s, sz);
+			if(s == NULL) {
+				perror("realloc()");
+				exit(EXIT_FAILURE);
+			}
+		}
+	}
+	while(done--)
+		putchar(s[done]);
 	free(s);
 	return 0;
 }
