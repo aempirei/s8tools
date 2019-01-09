@@ -47,8 +47,8 @@ unsigned char to_sllcomp(long x) {
 		return y | linear_max;
 	return y | himask | (highest_bit(x - linear_max) & lomask);
 }
-signed char to_sclip(long x) {
-	return (x < SCHAR_MIN) ? SCHAR_MIN : (x > SCHAR_MAX) ? SCHAR_MAX : x;
+unsigned char to_sclip(long x) {
+	return (unsigned char)((x < SCHAR_MIN) ? SCHAR_MIN : (x > SCHAR_MAX) ? SCHAR_MAX : x);
 }
 unsigned char to_uclip(long x) {
 	return (x < 0) ? 0 : (x > UCHAR_MAX) ? UCHAR_MAX : x;
@@ -73,8 +73,8 @@ long from_sllcomp(unsigned char x) {
 	x &= ~signbit;
 	return sign * (((x & himask) == himask) ? (linear_max + (1 << (x & lomask))) : x);
 }
-long from_sclip(signed char x) {
-	return x;
+long from_sclip(unsigned char x) {
+	return (char)x;
 }
 long from_uclip(unsigned char x) {
 	return x;
