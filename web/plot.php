@@ -50,10 +50,10 @@ $ticks3 = mkticks(0,$samples,8000);
 <path d="<?= $ticks1 ?>" stroke="#a88" stroke-width="1" />
 <path d="<?= $ticks2 ?>" stroke="#000" stroke-width="1" />
 <path d="<?= $ticks3 ?>" stroke="#f00" stroke-width="1" />
-<g stroke="blue" stroke-width="1" fill="none">
+<g stroke="blue" stroke-width="1" fill="none" transform="translate(20)">
         <?php include "./envelope.txt" ?>
 </g>
-<g stroke="red" stroke-width="1" fill="none">
+<g stroke="red" stroke-opacity="1" stroke-width="1" fill="none">
         <?php include "./waveform.txt" ?>
 </g>
 </svg>

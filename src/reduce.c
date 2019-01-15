@@ -52,6 +52,7 @@ OPCODE(or, |)
 OPCODE(mov, =)
 OPSIG(min) { return x < y ? x : y; }
 OPSIG(max) { return x > y ? x : y; }
+OPSIG(ruz) { return y ? y : x; }
 
 const instruction_t instruction_set[] = {
 	OPENTRY(add, '+'),
@@ -65,6 +66,7 @@ const instruction_t instruction_set[] = {
 	OPENTRY(mov, '='),
 	OPENTRY(min, '<'),
 	OPENTRY(max, '>'),
+	OPENTRY(ruz, '?'),
 	OPENTRY_END
 };
 
@@ -123,12 +125,12 @@ void print_code(code_t *code, FILE *fp) {
 }
 
 void print_register_names(FILE *fp) {
-	for(char r = 'A'; r <= 'Z'; r++) fprintf(fp,"%4c ", r);
+	for(char r = 'A'; r <= 'Z'; r++) fprintf(fp,"%5c ", r);
 	fputc('\n',fp);
 }
 
 void print_register_values(FILE *fp) {
-	for(char r = 'A'; r <= 'Z'; r++) fprintf(fp, "%4lx ", R(r));
+	for(char r = 'A'; r <= 'Z'; r++) fprintf(fp, "%5ld ", R(r));
 	fputc('\n',fp);
 }
 
