@@ -1,6 +1,7 @@
 bin
 data
 /lib
+web/*.txt
 *~
 *.swp
 *.o

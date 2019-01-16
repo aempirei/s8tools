@@ -2,6 +2,21 @@
 
 cd "`dirname "$0"`/.."
 
+if [ ${#@} -ne 1 ]; then
+	echo
+	echo `basename "$0"` width
+	echo
+	exit
+fi
+
 PATH=$PWD/bin:$PATH
 let width="$1"
-cons "$width" | w min max | r min | min "$width" | cons "$width" | avg "$width" | w l | r max | max "$width" | cons "$width" | avg "$width" | w r | mux l r
+echo using convolution width $width >&2
+
+( r txt | fan pl pr | r pl | plot | w txtl | r pr | plot | w txtr | r txtl txtr > web/envelope.txt ) &
+( r dat > envelope.dat ) &
+
+w - x | extrema2 | ne 0 | mux - x | mul | cons "$width" | w min max \
+	| r min | min "$width" | w l \
+	| r max | max "$width" | w r \
+	| mux l r | w dat txt
