@@ -1,6 +1,6 @@
 <?php
 header("Pragma: no-cache");
-$samples = 12115;
+$samples = 6000;
 ?>
 <html><head>
 <style>
