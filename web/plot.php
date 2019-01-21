@@ -1,6 +1,6 @@
 <?php
 header("Pragma: no-cache");
-$samples = 6000;
+$samples = 5000;
 ?>
 <html><head>
 <style>
@@ -20,41 +20,49 @@ text-align:center;
 <div class='content'>
 <svg id='s' xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
 width="1280"
-height="100"
-viewbox="0 -64 <?= $samples ?> 128" preserveAspectRatio="none"
+height="500"
+viewbox="0 -128 <?= $samples ?> 520" preserveAspectRatio="none"
 >
-<rect height="100%" width="100%" fill="whitesmoke" />
-<rect height="256" y="-128" width="50%" fill="RGBA(255,0,0,0.25)" id='hl' />
-<path d="M 0 0 L <?= $samples ?> 0" stroke="#f00" stroke-width="1" />
+<rect height="100%" y="-128" fill="RGBA(255,0,0,0.25)" id='hl' />
 <?php
 
-function mkticks($min,$max,$step) {
-	$ticks = '';
+function mkticks($min,$max,$step,$tick_sz) {
+	$s = sprintf("M %d %d l %d %d", $min, -$tick_sz, 0, 2 * $tick_sz);
 	for($i = min; $i < $max; $i += $step)
-		if($i % ($step * 10) != 0)
-			$ticks .= sprintf("M %d -128 l 0 256 ", $i);
-	return $ticks;
+		$s .= sprintf(" m %d %d l 0 %d", $step, -2 * $tick_sz, 2 * $tick_sz);
+	return $s;
 }
 
-$vticks = '';
 
-for($i = -128; $i < 128; $i += 16)
-	$vticks .= sprintf("M 0 %d l $samples 0 ", $i);
-
-$ticks1 = mkticks(0,$samples,80);
-$ticks2 = mkticks(0,$samples,800);
-$ticks3 = mkticks(0,$samples,8000);
+function vkticks($min,$max,$xstep,$ystep,$tick_sz) {
+	$s = '';
+	for($i = -128; $i < 128; $i += $ystep)
+		for($j = $min; $j < $max; $j += $xstep)
+			$s .= sprintf("M %d %d l %d 0", $j - $tick_sz, $i, 2 * $tick_sz);
+	return $s;
+}
 
 ?>
-<path d="<?= $vticks ?>" stroke="#a88" stroke-width="1" />
-<path d="<?= $ticks1 ?>" stroke="#a88" stroke-width="1" />
-<path d="<?= $ticks2 ?>" stroke="#000" stroke-width="1" />
-<path d="<?= $ticks3 ?>" stroke="#f00" stroke-width="1" />
-<g stroke="blue" stroke-width="1" fill="none" transform="translate(20)">
-        <?php include "./envelope.txt" ?>
+<g>
+	<path d="M 0 0 L <?= $samples ?> 0" stroke="#f00" stroke-width="1" />
+	<path d="<?= vkticks(0,$samples,400,25.5,16) ?>" stroke="#a88" stroke-width="1" />
+	<path d="<?= mkticks(0,$samples,40,8) ?>" stroke="#a88" stroke-width="1" />
+	<path d="<?= mkticks(0,$samples,400,128) ?>" stroke="#000" stroke-width="1" />
+
+	<g stroke="red" stroke-width="1" fill="none"><?php include "./r1.txt" ?></g>
+	<g stroke="green" stroke-width="2" fill="none"><?php include "./g1.txt" ?></g>
+	<g stroke="blue" stroke-width="1" fill="none"><?php include "./b1.txt" ?></g>
 </g>
-<g stroke="red" stroke-opacity="1" stroke-width="1" fill="none">
-        <?php include "./waveform.txt" ?>
+
+<g transform="translate(0 264)">
+	<path d="M 0 0 L <?= $samples ?> 0" stroke="#f00" stroke-width="1" />
+	<path d="<?= vkticks(0,$samples,400,25.5,16) ?>" stroke="#a88" stroke-width="1" />
+	<path d="<?= mkticks(0,$samples,40,8) ?>" stroke="#a88" stroke-width="1" />
+	<path d="<?= mkticks(0,$samples,400,128) ?>" stroke="#000" stroke-width="1" />
+
+	<g stroke="red" stroke-width="1" fill="none"><?php include "./r2.txt" ?></g>
+	<g stroke="green" stroke-width="2" fill="none"><?php include "./g2.txt" ?></g>
+	<g stroke="blue" stroke-width="1" fill="none"><?php include "./b2.txt" ?></g>
 </g>
 </svg>
 </div>

@@ -4,7 +4,7 @@ cd "`dirname "$0"`/.."
 
 if [ ${#@} -ne 1 ]; then
 	echo
-	echo `basename "$0"` width
+	echo usage: `basename "$0"` width
 	echo
 	exit
 fi

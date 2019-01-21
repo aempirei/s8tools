@@ -15,6 +15,7 @@ binary_relation_t cmp_le;
 binary_relation_t cmp_ge;
 
 binary_function_t binary_add;
+binary_function_t binary_sub;
 binary_function_t binary_mul;
 binary_function_t binary_or;
 binary_function_t binary_xor;
@@ -24,6 +25,7 @@ binary_function_t binary_max;
 binary_function_t binary_avg;
 
 binary_function_t *binary_add_final;
+binary_function_t *binary_sub_final;
 binary_function_t *binary_mul_final;
 binary_function_t *binary_or_final;
 binary_function_t *binary_xor_final;

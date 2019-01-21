@@ -10,6 +10,7 @@
 #define BINARY_FUNCTION(N,O) int binary_##N(int a, int b) { return a O b; }
 
 BINARY_FUNCTION(add, +)
+BINARY_FUNCTION(sub, -)
 BINARY_FUNCTION(mul, *)
 BINARY_FUNCTION(or, |)
 BINARY_FUNCTION(xor, ^)
@@ -31,6 +32,7 @@ FINAL_FUNCTION(n);
 #undef FINAL_FUNCTION
 
 binary_function_t *binary_add_final = final_div_1;
+binary_function_t *binary_sub_final = final_div_1;
 binary_function_t *binary_mul_final = final_div_1;
 binary_function_t *binary_or_final = final_div_1;
 binary_function_t *binary_xor_final = final_div_1;

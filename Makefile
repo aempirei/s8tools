@@ -1,7 +1,7 @@
 CC = gcc
 CCFLAGS = -Wall -W -w -lm
 CFLAGS = -Wall -W -Wno-switch -Wno-implicit-fallthrough -std=gnu11 -Isrc/lib
-FOLD = add mul or xor and min max avg
+FOLD = add sub mul or xor and min max avg
 CMP = eq ne lt gt le ge
 BANK = mean median mode rms
 SOURCES = $(wildcard src/*.c)
