@@ -1,0 +1,20 @@
+#!/bin/bash
+
+cd "`dirname "$0"`/.."
+
+if [ ! -f "$1" ]; then
+	echo
+	echo usage: `basename "$0"` data
+	echo
+	exit
+fi
+
+PATH=$PWD/bin:$PATH
+
+( r d | eq -1 | mux - fd | mul | hold | w - D > "$1.d" ) &
+( r x | ne  0 | mux - fx | mul | hold | w - X > "$1.x" ) &
+( r u | eq +1 | mux - fu | mul | hold | w - U > "$1.u" ) &
+( mux U D | avg | w - Z > "$1.0" ) &
+( mux X Z | sub > "$1.e" ) &
+
+cat "$1" | w - fu fd fx | extrema2 | w d x u
