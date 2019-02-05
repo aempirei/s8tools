@@ -14,8 +14,8 @@ static inline int clip(long int x) {
 	return x < CHAR_MIN ? CHAR_MIN : x > CHAR_MAX ? CHAR_MAX : x;
 }
 
-static inline dx(const char *x, size_t n) {
-	return clip((x[n-1] - x[0]) / (n - 1));
+static inline int dx(const char *x, size_t n) {
+	return clip(((int)x[n-1] - x[0]) / (int)(n - 1));
 }
 
 int main() {
