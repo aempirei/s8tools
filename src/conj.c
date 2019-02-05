@@ -16,7 +16,7 @@ static inline int f(char x) {
 }
 
 static inline int g(int y, int dy) {
-	return sign(dy) * f(y);
+	return (sign(dy) >= 0 ? 1 : -1) * f(y);
 }
 
 int main() {
