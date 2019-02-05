@@ -22,7 +22,7 @@ static inline int g(int y, int dy) {
 int main(int argc, char **argv) {
 	char x[3];
 	char mode = (argc == 2) ? argv[1][0] : '+';
-	int z = mode == '+' ? 1 : mode == '-' ? 1 : 0;
+	int z = mode == '+' ? 1 : mode == '-' ? -1 : 0;
 
 	if(s8_bank_init(x, 3, stdin)) {
 
