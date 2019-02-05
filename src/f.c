@@ -9,10 +9,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <s8.h>
-
-static inline int clip(long int x) {
-	return x < CHAR_MIN ? CHAR_MIN : x > CHAR_MAX ? CHAR_MAX : x;
-}
+#include <s8-inline-helpers.h>
 
 int main(int argc, char **argv) {
 	const size_t N = argc > 2 ? argc - 2 : 1;

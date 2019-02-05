@@ -5,10 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-int sign(int x) {
-	return x > 0 ? 1 : x < 0 ? -1 : 0;
-}
+#include <s8-inline-helpers.h>
 
 int main() {
 	int ch;
