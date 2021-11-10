@@ -1,6 +1,6 @@
 CC = gcc
-CCFLAGS = -Wall -W -w -lm
-CFLAGS = -Wall -W -Wno-switch -Wno-implicit-fallthrough -std=gnu11 -Isrc/lib
+CCFLAGS = -Wall -W -w -lm -O3
+CFLAGS = -Wall -W -Wno-switch -Wno-implicit-fallthrough -O3 -std=gnu11 -Isrc/lib
 FOLD = add sub mul or xor and min max avg
 CMP = eq ne lt gt le ge
 BANK = mean median mode rms
